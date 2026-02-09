@@ -30,9 +30,6 @@ ROS is like a  **robot translator** . It helps the camera and wheels talk to eac
 * If the camera sees a wall, ROS tells the wheels to stop or turn.
 * If the camera sees an open path, ROS tells the wheels to move forward.
 
-### ROS Distributions
-
-![ros1 distro](images/ROS-release.png)
 
 ## ROS Workspace
 
