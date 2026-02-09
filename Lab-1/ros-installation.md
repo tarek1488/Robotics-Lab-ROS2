@@ -1,113 +1,152 @@
-# Installation Guide: Ubuntu 20.04 and ROS 1 Noetic
+# ROS2 Humble and Gazebo 11 Installation Guide
 
-## Install Ubuntu 20.04
+This guide provides step-by-step instructions for installing ROS2 Humble and Gazebo 11 on Windows using WSL (Ubuntu 22.04).
 
-There are two ways to install Ubuntu 20.04: **using a Virtual Machine (VM)** or  **setting up a dual-boot system** . Choose the method that best suits your needs
+## Prerequisites
 
-### Option 1: Install Ubuntu on a Virtual Machine
+### Install Ubuntu 22.04 on WSL
 
-A Virtual Machine (VM) allows you to run Ubuntu alongside your existing operating system without modifying your disk partitions. This is a good option if you want to test Ubuntu or ROS without affecting your current setup.
+1. Open the Microsoft Store
+2. Search for and install [Ubuntu 22.04.5 LTS](https://www.microsoft.com/store/productId/9PN20MSR04DW)
+3. Launch Ubuntu from the Start menu or WSL terminal
 
-For a **detailed step-by-step guide** on installing Ubuntu 20.04 on a Virtual Machine, refer to this resource:
+## Installation Steps
 
-[Ubuntu VM Installation Guide](https://github.com/arab-meet/1.Robotics-Tools-Workshop/blob/master/Introduction%20to%20Linux%20and%20ubuntu%20installation/Hands-on%20Ubuntu%20VM%20Installation.md)
-
-### Option 2: Dual-Boot Ubuntu with Your Existing OS
-
-Dual-booting allows you to install Ubuntu alongside your current operating system  (Windows).
-
-For a **detailed step-by-step guide** on dual-booting Ubuntu 20.04, refer to this resource:
-
-[Ubuntu dual-boot installation guide ](https://github.com/arab-meet/1.Robotics-Tools-Workshop/blob/master/Introduction%20to%20Linux%20and%20ubuntu%20installation/Introduction%20to%20Linux%20and%20ubuntu%20installation.md)
-
-## Set Up Ubuntu for ROS Installation
-
-### Step 1: Update and Upgrade System
-
-Open a terminal and run the following command to ensure your system is up to date:
+### 1. Install Gazebo
 
 ```bash
 sudo apt update
+sudo apt upgrade
+sudo apt install gazebo
 ```
 
-### Step 2: Enable Required Repositories
+### 2. Install ROS2 Humble
 
-ROS Noetic requires the `universe`, `multiverse`, and `restricted` repositories to be enabled. These are usually enabled by default, but you can verify and enable them with the following commands:
+Reference: [ROS 2 Documentation: Humble](https://docs.ros.org/en/humble/Installation/Ubuntu-Install-Debs.html)
+
+**Note:** It's recommended to copy commands from the official website. Commands are provided here for convenience.
+
+#### Step 1: Set Locale
+
+```bash
+locale  # check for UTF-8
+
+sudo apt update && sudo apt install locales
+sudo locale-gen en_US en_US.UTF-8
+sudo update-locale LC_ALL=en_US.UTF-8 LANG=en_US.UTF-8
+export LANG=en_US.UTF-8
+
+locale  # verify settings
+```
+
+#### Step 2: Setup Sources
 
 ```bash
 sudo apt install software-properties-common
 sudo add-apt-repository universe
-sudo add-apt-repository multiverse
-sudo add-apt-repository restricted
+```
+
+#### Step 3: Add ROS 2 GPG Key
+
+```bash
+sudo apt update && sudo apt install curl -y
+export ROS_APT_SOURCE_VERSION=$(curl -s https://api.github.com/repos/ros-infrastructure/ros-apt-source/releases/latest | grep -F "tag_name" | awk -F\" '{print $4}')
+curl -L -o /tmp/ros2-apt-source.deb "https://github.com/ros-infrastructure/ros-apt-source/releases/download/${ROS_APT_SOURCE_VERSION}/ros2-apt-source_${ROS_APT_SOURCE_VERSION}.$(. /etc/os-release && echo ${UBUNTU_CODENAME:-${VERSION_CODENAME}})_all.deb"
+sudo dpkg -i /tmp/ros2-apt-source.deb
+```
+
+#### Step 4: Update Package Index
+
+```bash
 sudo apt update
+sudo apt upgrade
 ```
 
-## Install ROS 1 Noetic
-
-### Step 1: Set Up ROS Sources
-
-1. Add the ROS Noetic repository to your system:
-
-   ```bash
-   sudo sh -c 'echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/ros-latest.list'
-   ```
-2. Add the ROS key to authenticate packages:
-
-   ```bash
-   sudo apt install curl
-   curl -s https://raw.githubusercontent.com/ros/rosdistro/master/ros.asc | sudo apt-key add -
-   ```
-3. Update the package list:
-
-   ```bash
-   sudo apt update
-   ```
-
-### Step 2: Install ROS Noetic
-
-1. Install ROS Dependencies
-
-Install additional tools and dependencies for building ROS packages:
+#### Step 5: Install ROS2 Desktop
 
 ```bash
-sudo apt install python3-rosdep python3-rosinstall python3-rosinstall-generator python3-wstool build-essential
-sudo apt install python3-catkin-tools
+sudo apt install ros-humble-desktop
 ```
 
-### Step 4: Initialize rosdep
-
-1. Initialize `rosdep`:
-
-   ```bash
-   sudo apt install python3-rosdep
-   sudo rosdep init
-   rosdep update
-   ```
-
-## Configure ROS Environment
-
-### Step 1: Source ROS Setup Script
-
-To use ROS, you need to source the setup script in every new terminal session. Add the following line to your `~/.bashrc` file to automate this:
+#### Step 6: Install Development Tools
 
 ```bash
-echo "source /opt/ros/noetic/setup.bash" >> ~/.bashrc
+sudo apt install ros-dev-tools
+```
+
+#### Step 7: Setup Environment (Auto-source on Terminal Launch)
+
+This step adds the ROS source file to your bash configuration, so it runs automatically whenever you open a terminal.
+
+```bash
+echo "source /opt/ros/humble/setup.bash" >> ~/.bashrc
 source ~/.bashrc
 ```
 
-## Verify ROS Installation
+#### Step 8: Test ROS2 Installation
 
-### Step 1: Test ROS Installation
+Open two separate terminal windows and run:
 
-1. Open a new terminal and run the following command to start the ROS master:
+**Terminal 1:**
+```bash
+ros2 run demo_nodes_cpp talker
+```
 
-   ```bash
-   roscore
-   ```
-2. In another terminal, run the following command to list active ROS topics:
+**Terminal 2:**
+```bash
+ros2 run demo_nodes_py listener
+```
 
-   ```bash
-   rostopic list
-   ```
+You should see the talker publishing messages and the listener receiving them.
 
-If you see output like `/rosout` and `/rosout_agg`, ROS is installed correctly.
+## Connecting ROS2 to Gazebo 11
+
+Reference: [Gazebo ROS Packages Tutorial](http://gazebosim.org/tutorials?tut=ros2_installing&cat=connect_ros)
+
+**Note:** Replace `foxy` with `humble` when following the tutorial.
+
+### Install Gazebo ROS Packages
+
+```bash
+sudo apt install ros-humble-gazebo-ros-pkgs
+sudo apt install ros-humble-ros-core ros-humble-geometry2
+```
+
+### Test the Integration
+
+#### 1. Launch Gazebo with Demo World
+
+```bash
+gazebo --verbose /opt/ros/humble/share/gazebo_plugins/worlds/gazebo_ros_diff_drive_demo.world
+```
+
+#### 2. (Optional) View World File
+
+Install `gedit` for easier file editing in WSL:
+
+```bash
+sudo apt install gedit
+gedit /opt/ros/humble/share/gazebo_plugins/worlds/gazebo_ros_diff_drive_demo.world
+```
+
+#### 3. Test Robot Control
+
+Open a third terminal and publish a velocity command:
+
+```bash
+ros2 topic pub /demo/cmd_demo geometry_msgs/Twist '{linear: {x: 1.0}}' -1
+```
+
+The robot in Gazebo should start moving forward.
+
+## Troubleshooting
+
+- If you encounter permission issues, ensure you're running commands with appropriate privileges
+- For display issues in WSL, you may need to install an X server (like VcXsrv or WSLg)
+- Make sure all terminals have sourced the ROS2 setup file (or restart terminals after Step 7)
+
+## Additional Resources
+
+- [ROS2 Humble Documentation](https://docs.ros.org/en/humble/)
+- [Gazebo Tutorials](http://gazebosim.org/tutorials)
+- [ROS2 + Gazebo Integration](http://gazebosim.org/tutorials?cat=connect_ros)
