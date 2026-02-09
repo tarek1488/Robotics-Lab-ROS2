@@ -37,11 +37,10 @@ A ROS workspace is a **folder** where you keep all your ROS projects, code, and 
 
 #### What’s Inside a ROS Workspace?
 
-1. **src (Source)** : This is where you keep all your robot’s code .
-2. **build** : This is where ROS prepares your code to run.
-3. **devel** : This is where the finished, ready-to-use programs are stored.
-   ![ws](images//ws.png)
-
+1. **src (Source)** : This is where you keep all your robot’s code.
+2. **build** : This is where ROS 2 temporarily stores files while it’s putting your code together.
+3. **install** : This is where the finished, ready-to-use parts of your robot’s software are placed.
+   
 ### Steps to Create a ROS Workspace:
 
 1. **Open a Terminal**
@@ -50,9 +49,9 @@ A ROS workspace is a **folder** where you keep all your ROS projects, code, and 
 * Type the following command to create a new folder for your workspace:
 
   ```bash
-  mkdir -p ~/catkin_ws/src
+  mkdir -p ~/ros2_ws/src
   ```
-* `catkin_ws` is the name of your workspace (you can name it anything you like).
+* `ros2_ws` is the name of your workspace (you can name it anything you like).
 * The `src` folder is where you’ll put your ROS packages (your code).
 
 3. **Navigate to the Workspace** :
@@ -60,30 +59,23 @@ A ROS workspace is a **folder** where you keep all your ROS projects, code, and 
 * Move into the workspace folder by typing:
 
   ```bash
-  cd ~/catkin_ws
+  cd ~/ros2_ws
   ```
 
 4. **Build Workspace :**
-
-* Make sure that you install catkin
-
   ```bash
-  sudo apt install ros-noetic-catkin
+  colcon build
   ```
-* Run `catkin_make` to compile the workspace:
-
-  ```bash
-  catkin_make
-  ```
-
-* [ ] This creates the `build` and `devel` folders inside your workspace.
+* [ ] This creates the `build`, `install`, and `logs` folders inside your workspace.
 
 5. **Source the Workspace** :
 
 * To use your workspace, you need to "activate" it by running:
   ```bash
-  source devel/setup.bash
+  echo "source ~/ros2_ws/install/setup.bash" >> ~/.bashrc
+  source ~/.bashrc
   ```
+* [ ] This keeps your workspace directly whenever you make any new terminal:
 
 * [ ] This tells your terminal to use the ROS packages in your workspace.
 
